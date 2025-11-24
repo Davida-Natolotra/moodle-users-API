@@ -1,16 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Customfield as MoodleCustomField } from '../interfaces/mdl-user';
+import { MdlUser, Customfield as MoodleCustomField } from '../interfaces/mdl-user';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MdlServicesService {
-  private apiUrl = 'http://localhost/webservice/rest/server.php';
-  private token = 'ae30385d78c51c3035371928bb621be9';
+  private apiUrl = environment.apiUrl;
+  private token = environment.token;
 
   constructor(private http: HttpClient) {}
+
+  getUserByEmail(email: string): Observable<any> {
+    const params = new HttpParams()
+      .set('wstoken', this.token)
+      .set('wsfunction', 'core_user_get_users')
+      .set('moodlewsrestformat', 'json')
+      .set('criteria[0][key]', 'email')
+      .set('criteria[0][value]', email);
+    return this.http.get(this.apiUrl, { params }) as Observable<any>;
+  }
 
   updateExistingCustomFields(userId: number, customFields: MoodleCustomField[]): Observable<any> {
     let params = new HttpParams()

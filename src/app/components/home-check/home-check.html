@@ -1,0 +1,29 @@
+<div id="page" class="container-fluid mt-0">
+  <h2>Status de validation de votre adresse email</h2>
+  @if(email) {
+  <p>Email: {{ email }}</p>
+  <p *ngIf="isValid; else invalidEmail" style="color: green">Cet email est valide</p>
+  <ng-template #invalidEmail>
+    <p style="color: red">This email address is **invalid**. Please enter a valid format.</p>
+  </ng-template>
+  }
+  <div *ngIf="!email">
+    <p>Please provide an email address to check its validity.</p>
+  </div>
+  <h3>Email Approval Status</h3>
+  @if(userData != undefined) {
+  <p *ngIf="userData.confirmed === true; else suspendedUser" style="color: green">
+    Votre email est approuvé dans le système.
+  </p>
+  <ng-template #suspendedUser>
+    <p style="color: red">Votre compte n'est pas approuvé</p>
+  </ng-template>
+  } @else {
+
+  <p style="color: red">
+    Le compte associé à cette adresse email n'existe pas. Veuillez contacter l'administrateur de la
+    plateforme.
+  </p>
+
+  }
+</div>

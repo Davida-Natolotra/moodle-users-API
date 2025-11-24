@@ -1,4 +1,4 @@
-interface MdlUser {
+export interface MdlUser {
   id: number;
   username: string;
   firstname: string;
