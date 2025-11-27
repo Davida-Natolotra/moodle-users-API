@@ -29,6 +29,11 @@ export class UpdateUser implements OnInit {
   private ouService = inject(OrgUnitsService); // Inject the new service
   private mdlService = inject(MdlServicesService);
   private usersService = inject(Users);
+  userInitRegion: string | null | undefined = '';
+  userInitRegionId: string | null | undefined = '';
+  userInitDistrict: string | null | undefined = '';
+  userInitCommune: string | null | undefined = '';
+  userInitFS: string | null | undefined = '';
 
   API_URL = environment.backendApiUrl;
   // Signal derived from API Observable using toSignal
@@ -69,35 +74,22 @@ export class UpdateUser implements OnInit {
 
   constructor() {
     this.ouForm = this.fb.group({
-      level2: [
-        {
-          value: this.usersService
-            .currentUser()
-            ?.customfields?.filter((el) => el.shortname === 'region')[0]?.displayvalue,
-        },
-        Validators.required,
-      ],
+      level2: ['', [Validators.required]],
       level3: [
         {
-          value: this.usersService
-            .currentUser()
-            ?.customfields?.filter((el) => el.shortname === 'district'),
+          value: '',
           disabled: true,
         },
       ],
       level4: [
         {
-          value: this.usersService
-            .currentUser()
-            ?.customfields?.filter((el) => el.shortname === 'commune'),
+          value: '',
           disabled: true,
         },
       ],
       level5: [
         {
-          value: this.usersService
-            .currentUser()
-            ?.customfields?.filter((el) => el.shortname === 'fs'),
+          value: '',
           disabled: true,
         },
       ],
@@ -149,10 +141,22 @@ export class UpdateUser implements OnInit {
       }
     });
 
-    console.log(
-      'Curr region: ',
-      this.usersService.currentUser()?.customfields?.filter((el) => el.shortname === 'region')
-    );
+    effect(() => {
+      const userRegionId = this.usersService
+        .currentUser()
+        ?.customfields?.find((cf) => cf.shortname === 'Region')
+        ?.value.split('-')[0];
+      console.log('User Region ID: ', userRegionId);
+      this.userInitRegionId = userRegionId;
+
+      this.userInitRegion = this.allUnits().find((unit) => unit.id === userRegionId)?.name;
+
+      const userDistrict = this.usersService
+        .currentUser()
+        ?.customfields?.find((cf) => cf.shortname === 'District')?.value;
+      console.log('Current init region: ', this.userInitRegion);
+      console.log('Curr district: ', userDistrict);
+    });
   }
 
   // 5. ngOnInit to connect Form Value Changes to Selection Signals - Logic remains the same
