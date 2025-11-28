@@ -11,7 +11,7 @@ import { Users } from '../../shared/users';
 import { MdlUser } from '../../interfaces/mdl-user';
 import { MdlServicesService } from '../../services/mdl-services.service';
 import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
-
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { JsonPipe } from '@angular/common'; // <-- Imported JsonPipe
 import { OrgUnitsService } from '../../services/org-units.service';
@@ -19,7 +19,7 @@ import { environment } from '../../../environments/environment.development';
 
 @Component({
   selector: 'app-update-user',
-  imports: [ReactiveFormsModule, JsonPipe], // <-- Added JsonPipe here
+  imports: [ReactiveFormsModule, JsonPipe, MatAutocompleteModule], // <-- Added JsonPipe here
   templateUrl: './update-user.html',
   styleUrl: './update-user.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,11 +29,15 @@ export class UpdateUser implements OnInit {
   private ouService = inject(OrgUnitsService); // Inject the new service
   private mdlService = inject(MdlServicesService);
   private usersService = inject(Users);
-  userInitRegion: string | null | undefined = '';
+  userRegion: string | null | undefined = '';
   userInitRegionId: string | null | undefined = '';
-  userInitDistrict: string | null | undefined = '';
-  userInitCommune: string | null | undefined = '';
-  userInitFS: string | null | undefined = '';
+  userDistrict: string | null | undefined = '';
+  userCommune: string | null | undefined = '';
+  userFS: string | null | undefined = '';
+  userPoste: string | null | undefined = '';
+  userName: string | null | undefined = '';
+  userFirstName: string | null | undefined = '';
+  userLastName: string | null | undefined = '';
 
   API_URL = environment.backendApiUrl;
   // Signal derived from API Observable using toSignal
@@ -53,6 +57,7 @@ export class UpdateUser implements OnInit {
   private level2SelectionId = signal<string | null>(null);
   private level3SelectionId = signal<string | null>(null);
   private level4SelectionId = signal<string | null>(null);
+  private level5SelectionId = signal<string | null>(null);
 
   // Computed signals for options lists
   level2Options = computed(() => this.allUnits().filter((unit) => unit.level === 2));
@@ -93,6 +98,9 @@ export class UpdateUser implements OnInit {
           disabled: true,
         },
       ],
+      name: [''],
+      familyName: [''], // Just for display purpose
+      poste: ['', Validators.required],
     });
 
     // 4. Effects for Cascading Logic (Enable/Disable/Reset) - Logic remains the same
@@ -143,32 +151,54 @@ export class UpdateUser implements OnInit {
 
     // Get initial values from the user
     effect(() => {
+      // Initialize form controls once data is available
       const userRegionId = this.usersService
         .currentUser()
-        ?.customfields?.find((cf) => cf.shortname === 'Region')
+        ?.customfields?.find((cf) => cf.shortname === 'region')
         ?.value.split('-')[0];
 
       if (userRegionId) {
         console.log('User Region ID: ', userRegionId);
 
-        this.userInitRegion = this.allUnits().find((unit) => unit.id === userRegionId)?.name;
-
-        // Initialize form controls once data is available
         this.ouForm.get('level2')?.setValue(userRegionId, { emitEvent: false });
         this.level2SelectionId.set(userRegionId);
+        this.userRegion = this.allUnits().find((ou) => ou.id === userRegionId)?.name;
       }
 
       const userDistrictId = this.usersService
         .currentUser()
-        ?.customfields?.find((cf) => cf.shortname === 'District')?.value;
+        ?.customfields?.find((cf) => cf.shortname === 'district')
+        ?.value.split('-')[0];
       if (userDistrictId) {
         console.log('User District ID: ', userDistrictId);
 
-        this.userInitRegion = this.allUnits().find((unit) => unit.id === userDistrictId)?.name;
-
-        // Initialize form controls once data is available
         this.ouForm.get('level3')?.setValue(userDistrictId, { emitEvent: false });
-        this.level2SelectionId.set(userDistrictId);
+        this.level3SelectionId.set(userDistrictId);
+        this.userDistrict = this.allUnits().find((ou) => ou.id === userDistrictId)?.name;
+      }
+
+      const userCommunneId = this.usersService
+        .currentUser()
+        ?.customfields?.find((cf) => cf.shortname === 'commune')
+        ?.value.split('-')[0];
+      if (userCommunneId) {
+        console.log('User Commune ID: ', userCommunneId);
+
+        this.ouForm.get('level4')?.setValue(userCommunneId, { emitEvent: false });
+        this.level4SelectionId.set(userCommunneId);
+        this.userCommune = this.allUnits().find((ou) => ou.id === userCommunneId)?.name;
+      }
+
+      const userFSId = this.usersService
+        .currentUser()
+        ?.customfields?.find((cf) => cf.shortname === 'FS')
+        ?.value.split('-')[0];
+      if (userFSId) {
+        console.log('User Commune ID: ', userFSId);
+
+        this.ouForm.get('level5')?.setValue(userFSId, { emitEvent: false });
+        this.level5SelectionId.set(userFSId);
+        this.userFS = this.allUnits().find((ou) => ou.id === userFSId)?.name;
       }
     });
   }
@@ -199,5 +229,67 @@ export class UpdateUser implements OnInit {
       this.level4SelectionId.set(id);
       this.ouForm.get('level5')?.setValue('');
     });
+
+    if (this.usersService.currentUser()) {
+      this.userName = this.usersService.currentUser()!.username;
+      this.userFirstName = this.usersService.currentUser()!.firstname;
+      this.userLastName = this.usersService.currentUser()!.lastname;
+      this.userPoste = this.usersService
+        .currentUser()!
+        .customfields?.find((cf) => cf.shortname === 'poste')?.value;
+
+      this.ouForm.get('name')?.setValue(this.userFirstName);
+      this.ouForm.get('familyName')?.setValue(this.userLastName);
+      this.ouForm.get('poste')?.setValue(this.userPoste);
+    }
+  }
+
+  onSubmit() {
+    if (this.ouForm.valid) {
+      this.mdlService
+        .updateExistingCustomFields(this.usersService.currentUser()!.id, [
+          {
+            type: 'region',
+            value: this.ouForm.get('level2')?.value + '-' + this.userRegion,
+          },
+          {
+            type: 'district',
+            value: this.ouForm.get('level3')?.value + '-' + this.userDistrict,
+          },
+          { type: 'commune', value: this.ouForm.get('level4')?.value + '-' + this.userCommune },
+          { type: 'FS', value: this.ouForm.get('level5')?.value + '-' + this.userFS },
+          { type: 'poste', value: this.ouForm.get('poste')?.value },
+        ])
+        .subscribe(
+          (response) => {
+            console.log('Custom fields updated successfully:', response);
+            alert('Mise à jour effectuée avec succès!');
+          },
+          (error) => {
+            console.error('Error updating custom fields:', error);
+            alert("Une erreur s'est produite lors de la mise à jour.");
+          }
+        );
+    }
+    this.mdlService
+      .updateFirstName(this.usersService.currentUser()!.id, this.ouForm.get('name')?.value)
+      .subscribe(
+        (response) => {
+          console.log('First name updated successfully:', response);
+        },
+        (error) => {
+          console.error('Error updating first name:', error);
+        }
+      );
+    this.mdlService
+      .updateLastName(this.usersService.currentUser()!.id, this.ouForm.get('familyName')?.value)
+      .subscribe(
+        (response) => {
+          console.log('Last name updated successfully:', response);
+        },
+        (error) => {
+          console.error('Error updating last name:', error);
+        }
+      );
   }
 }

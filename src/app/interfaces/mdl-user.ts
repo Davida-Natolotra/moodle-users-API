@@ -33,7 +33,7 @@ interface Preference {
 export interface Customfield {
   type: string;
   value: string;
-  displayvalue: string;
-  name: string;
-  shortname: string;
+  displayvalue?: string;
+  name?: string;
+  shortname?: string;
 }

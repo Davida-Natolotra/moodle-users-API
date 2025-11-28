@@ -52,8 +52,9 @@
               class="form-control"
               name="username"
               id="id_username"
-              value=""
+              value="{{ userName }}"
               size="20"
+              disabled
             />
             <div class="form-control-feedback invalid-feedback" id="id_error_username"></div>
           </div>
@@ -68,7 +69,7 @@
             <input
               type="text"
               class="form-control"
-              name="firstname"
+              formControlName="name"
               id="id_firstname"
               value=""
               size="30"
@@ -88,7 +89,27 @@
             <input
               type="text"
               class="form-control"
-              name="lastname"
+              formControlName="familyName"
+              id="id_lastname"
+              value=""
+              size="30"
+              aria-required="true"
+              maxlength="100"
+            />
+            <div class="form-control-feedback invalid-feedback" id="id_error_lastname"></div>
+          </div>
+        </div>
+        <div id="fitem_id_lastname" class="mb-3 row fitem">
+          <div class="col-md-3 col-form-label d-flex pb-0 pr-md-0">
+            <label id="id_lastname_label" class="d-inline word-break" for="id_lastname">
+              Fonction/Poste
+            </label>
+          </div>
+          <div class="col-md-9 d-flex flex-wrap align-items-start felement" data-fieldtype="text">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="poste"
               id="id_lastname"
               value=""
               size="30"
@@ -227,6 +248,16 @@
         <pre class="bg-gray-50 p-4 rounded-lg text-sm whitespace-pre-wrap">{{
           ouForm.value | json
         }}</pre>
+      </div>
+      <div class="mb-3 fitem">
+        <input
+          type="button"
+          class="btn btn-primary"
+          (click)="onSubmit()"
+          value="Mettre à jour le profil"
+        />
+
+        <div class="form-control-feedback invalid-feedback" id="id_error_submitbutton"></div>
       </div>
     </form>
   </div>
