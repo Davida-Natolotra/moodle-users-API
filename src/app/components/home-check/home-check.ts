@@ -71,8 +71,9 @@ export class HomeCheck {
     this.isValid = true;
     this.mdlService.getUserByEmail(email).subscribe(
       (response) => {
-        this.usersService.setUser(response?.users[0]);
-        this.userData = response?.users[0];
+        console.log('User data retrieved:', response);
+        this.usersService.setUser(response);
+        this.userData = response;
       },
       (error) => {
         console.error('Error fetching user data:', error);

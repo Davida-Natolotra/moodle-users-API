@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MdlUser, Customfield as MoodleCustomField } from '../interfaces/mdl-user';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class MdlServicesService {
   private sendUpdateToNestJS(payload: Partial<MdlUser>): Observable<any> {
     // Angular now sends a clean JSON body to the NestJS API endpoint
     return this.http
-      .put(this.apiUrl + 'update-fields', payload, {
+      .patch(this.apiUrl + 'update-fields', payload, {
         responseType: 'json',
       })
       .pipe(catchError((error) => this.handleError(error)));

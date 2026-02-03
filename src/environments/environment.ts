@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://napi.formation-pev.com/mdl/',
-  backendApiUrl: 'https://napi.formation-pev.com/organisation-units',
+  apiUrl: 'https://my-app-57671971796.us-east1.run.app/mdl/',
+  backendApiUrl: 'https://my-app-57671971796.us-east1.run.app/organisation-units',
 };

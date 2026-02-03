@@ -35,7 +35,7 @@ export class OrgUnitsService {
           console.error(apiErrorMsg, error);
           return of({ data: [], loading: false, error: apiErrorMsg });
         }
-      })
+      }),
     );
   }
 }

@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/mdl/',
-  backendApiUrl: 'http://localhost:3000/organisation-units',
+  apiUrl: 'https://my-app-57671971796.us-east1.run.app/mdl/',
+  backendApiUrl: 'https://my-app-57671971796.us-east1.run.app/organisation-units',
 };
