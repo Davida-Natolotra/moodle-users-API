@@ -4,7 +4,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Overall architecture
 
-This app check wether the email address in the input by sending it in a request to the backend (NestJS). The backend responds wether the email address is attached to existing Moodle user profile. If the response is OK ,i.e. user exists, this app will load the profile page in a form. It will send requests to the backend, fetching all relevant user profile from Moodle API, fetching the organisation units from databases. On submit, the user profile on the moodle instance is updated.
+This app checks whether  the email address in the input by sending it in a request to the backend (NestJS). The backend responds whether the email address is attached to existing Moodle user profile. If the response is OK ,i.e. user exists, this app will load the profile page in a form. It will send requests to the backend, fetching all relevant user profile from Moodle API and fetching the organisation units from databases. Data on the database are already processed to match the existing organisation unit on DHIS2. On submit, the user profile on the moodle instance is updated.
 
 ## Development server
 
@@ -61,4 +61,5 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
 
